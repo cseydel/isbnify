@@ -1,9 +1,5 @@
 require "spec_helper"
 
-class Test
-  include Isbnify
-end
-
 describe Isbnify do
   describe "with correct includes" do
     it "responds to hyphinate_isbn" do
@@ -20,43 +16,20 @@ describe Isbnify do
   end
 
   describe "with class methods" do
-    context "with string_argument_validations" do
-      it "raises ArgumentError on missing isbn_string" do
-        expect { Test.hyphinate_isbn }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on missing isbn_string with message" do
-        expect { Test.valid_isbn? }.to raise_error(ArgumentError, "expected argument not to be nil")
-      end
-
-      it "raises ArgumentError on not string object" do
-        expect { Test.hyphinate_isbn(1) }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on not string object with message" do
-        expect { Test.valid_isbn?(1) }.to raise_error(ArgumentError, "expected argument to be String")
-      end
+    it "delegates to ISBN.hyphinate_isbn" do
+      Isbnify::ISBN.any_instance.should_receive(:hyphinate_isbn).once
+      Test.hyphinate_isbn
     end
 
-    context "with integer_argument_validations" do
-      it "raises ArgumentError on missing number" do
-        expect { Test.create_isbn }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on missing number with message" do
-        expect { Test.create_isbn }.to raise_error(ArgumentError, "expected argument not to be nil")
-      end
-
-      it "raises ArgumentError on not Integer number" do
-        expect { Test.create_isbn("error") }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on not Integer number with message" do
-        expect { Test.create_isbn("error") }.to raise_error(ArgumentError, "expected argument to be Integer")
-      end
+    it "delegates to ISBN.valid_isbn?" do
+      Isbnify::ISBN.any_instance.should_receive(:valid_isbn?).once
+      Test.valid_isbn?
     end
 
-    it { expect { Isbnify::ISBN.create_isbn(1) }.not_to raise_error }
+    it "delegates to ISBN.create_isbn" do
+      Isbnify::ISBN.any_instance.should_receive(:create_isbn).once
+      Test.create_isbn
+    end
   end
 
 end
