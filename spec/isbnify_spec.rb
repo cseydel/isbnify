@@ -55,6 +55,8 @@ describe Isbnify do
         expect { Test.create_isbn("error") }.to raise_error(ArgumentError, "expected argument to be Integer")
       end
     end
+
+    it { expect { Isbnify::ISBN.create_isbn(1) }.not_to raise_error }
   end
 
 end
