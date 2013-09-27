@@ -5,6 +5,10 @@ module Isbnify
     base.extend(ClassMethods)
   end
 
+  class Isbnify
+    include Isbnify
+  end
+
   module ClassMethods
     def hyphinate_isbn(isbn_string = nil)
       string_argument_validations(isbn_string)
