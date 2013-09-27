@@ -18,6 +18,9 @@ module Isbnify
       integer_argument_validations(number)
     end
 
+
+    private
+
     def string_argument_validations(isbn_string)
       validate_presence_of_attribute(isbn_string)
       validate_type_of_attribute(isbn_string, "String")
