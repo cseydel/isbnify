@@ -38,6 +38,10 @@ module Isbnify
 
     private
 
+    def has_isbn13_length?
+      sanitize_isbn_string.length == 13
+    end
+
     def validate_isbn_format
 
     end
@@ -51,6 +55,7 @@ module Isbnify
     end
 
     def validate_checksum
+      return false unless has_isbn13_length?
       validate_with_sanitized_string(sanitize_isbn_string)
     end
 

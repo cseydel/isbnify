@@ -84,6 +84,30 @@ describe Isbnify::ISBN do
       it "validates incorrect ISBN and returns false" do
         Isbnify::ISBN.valid_isbn?("978-3-404-16669-7").should be_false
       end
+
+      it "validates malformed correct ISBN and returns true" do
+        Isbnify::ISBN.valid_isbn?("978.3.404.16669.5").should be_true
+      end
+
+      it "validates malformed and incorrect ISBN and returns false" do
+        Isbnify::ISBN.valid_isbn?("ISBN 978/3/404/16669/7").should be_false
+      end
+
+      it "validates too short ISBN and returns false" do
+        Isbnify::ISBN.valid_isbn?("978-3-404-16669").should be_false
+      end
+
+      it "validates malformed and too short ISBN and returns false" do
+        Isbnify::ISBN.valid_isbn?("978.3.404.16669").should be_false
+      end
+
+      it "validates too long ISBN and returns false" do
+        Isbnify::ISBN.valid_isbn?("978-3-404-16669-27").should be_false
+      end
+
+      it "validates malformed and too long ISBN and returns false" do
+        Isbnify::ISBN.valid_isbn?("978.3.404.16669.27").should be_false
+      end
     end
 
   end
