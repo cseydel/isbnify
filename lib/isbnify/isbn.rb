@@ -3,7 +3,7 @@ module Isbnify
 
     attr_accessor :param
 
-    def initialize(param)
+    def initialize(param = nil)
       @param = param
     end
 
@@ -28,6 +28,7 @@ module Isbnify
 
     def valid_isbn?
       string_argument_validations(param)
+      validate_checksum
     end
 
     def create_isbn
@@ -36,6 +37,34 @@ module Isbnify
 
 
     private
+
+    def validate_isbn_form
+
+    end
+
+    def sanitize_isbn_string
+      param.gsub(/[^0-9]/, "")
+    end
+
+    def validate_checksum
+      validate_with_sanitized_string(sanitize_isbn_string)
+    end
+
+    def validate_with_sanitized_string(s_string)
+      s_string[-1].to_i == ((10 - (inject_with_index(s_string[0..-2].split("")) % 10)) % 10)
+    end
+
+    def inject_with_index(array)
+      number = array.each_index.inject(0){ |sum, index| calculate_sum(sum, array[index].to_i, index) }
+    end
+
+    def calculate_sum(sum, number, index)
+      sum + exponate_number_with_index(number, index)
+    end
+
+    def exponate_number_with_index(number, index)
+      number * (3 ** ((index + 2) % 2))
+    end
 
     def string_argument_validations(isbn_string)
       validate_presence_of_attribute(isbn_string)
