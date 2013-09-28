@@ -55,7 +55,7 @@ module Isbnify
     end
 
     def inject_with_index(array)
-      number = array.each_index.inject(0){ |sum, index| calculate_sum(sum, array[index].to_i, index) }
+      number = array.each_index.inject(0){ |sum, index| calculate_sum(sum, array[index].to_i, index + 1) }
     end
 
     def calculate_sum(sum, number, index)
@@ -63,7 +63,7 @@ module Isbnify
     end
 
     def exponate_number_with_index(number, index)
-      number * (3 ** ((index + 2) % 2))
+      number * (3 ** ((index + 1) % 2))
     end
 
     def string_argument_validations(isbn_string)
