@@ -38,7 +38,7 @@ module Isbnify
 
     private
 
-    def validate_isbn_form
+    def validate_isbn_format
 
     end
 
@@ -46,16 +46,24 @@ module Isbnify
       param.gsub(/[^0-9]/, "")
     end
 
+    def string_to_array(string)
+      string[0..-2].split("")
+    end
+
     def validate_checksum
       validate_with_sanitized_string(sanitize_isbn_string)
     end
 
-    def validate_with_sanitized_string(s_string)
-      s_string[-1].to_i == ((10 - (inject_with_index(s_string[0..-2].split("")) % 10)) % 10)
+    def validate_with_sanitized_string(sanitized_string)
+      sanitized_string[-1].to_i == calculate_checksum(sanitized_string)
+    end
+
+    def calculate_checksum(string)
+      (10 - (inject_with_index(string_to_array(string)) % 10)) % 10
     end
 
     def inject_with_index(array)
-      number = array.each_index.inject(0){ |sum, index| calculate_sum(sum, array[index].to_i, index + 1) }
+      array.each_index.inject(0){ |sum, index| calculate_sum(sum, array[index].to_i, index + 1) }
     end
 
     def calculate_sum(sum, number, index)
@@ -81,7 +89,7 @@ module Isbnify
     end
 
     def validate_type_of_attribute(attribute, type)
-      raise ArgumentError, "expected argument to be #{type}" if not attribute.is_a?(Module.const_get(type))
+      raise ArgumentError, "expected argument to be #{type}" unless attribute.is_a?(Module.const_get(type))
     end
   end
 end
