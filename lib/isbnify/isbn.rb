@@ -38,10 +38,6 @@ module Isbnify
 
     private
 
-    def has_isbn13_length?
-      sanitize_isbn_string.length == 13
-    end
-
     def validate_isbn_format
 
     end
@@ -55,7 +51,6 @@ module Isbnify
     end
 
     def validate_checksum
-      return false unless has_isbn13_length?
       validate_with_sanitized_string(sanitize_isbn_string)
     end
 
@@ -82,11 +77,17 @@ module Isbnify
     def string_argument_validations(isbn_string)
       validate_presence_of_attribute(isbn_string)
       validate_type_of_attribute(isbn_string, "String")
+      validates_isbn13_length
     end
 
     def integer_argument_validations(number)
       validate_presence_of_attribute(number)
       validate_type_of_attribute(number, "Integer")
+      validates_isbn13_length
+    end
+
+    def validates_isbn13_length
+      raise ArgumentError, "expected argument to include exactly 13 digits" unless sanitize_isbn_string.length == 13
     end
 
     def validate_presence_of_attribute(attribute)

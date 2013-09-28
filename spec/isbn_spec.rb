@@ -74,6 +74,24 @@ describe Isbnify::ISBN do
       it "raises ArgumentError on not Integer number with message" do
         expect { Isbnify::ISBN.new("error").create_isbn }.to raise_error(ArgumentError, "expected argument to be Integer")
       end
+
+      context "with isbn length validation" do
+        it "validates too short ISBN and returns false" do
+          expect { Isbnify::ISBN.new("978-3-404-16669").valid_isbn? }.to raise_error(ArgumentError)
+        end
+
+        it "validates malformed and too short ISBN and returns false" do
+          expect { Isbnify::ISBN.new("978.3.404.16669").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
+        end
+
+        it "validates too long ISBN and returns false" do
+          expect { Isbnify::ISBN.new("978-3-404-16669-27").valid_isbn? }.to raise_error(ArgumentError)
+        end
+
+        it "validates malformed and too long ISBN and returns false" do
+          expect { Isbnify::ISBN.new("978.3.404.16669.27").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
+        end
+      end
     end
 
     context "with valid_isbn?" do
@@ -91,22 +109,6 @@ describe Isbnify::ISBN do
 
       it "validates malformed and incorrect ISBN and returns false" do
         Isbnify::ISBN.valid_isbn?("ISBN 978/3/404/16669/7").should be_false
-      end
-
-      it "validates too short ISBN and returns false" do
-        Isbnify::ISBN.valid_isbn?("978-3-404-16669").should be_false
-      end
-
-      it "validates malformed and too short ISBN and returns false" do
-        Isbnify::ISBN.valid_isbn?("978.3.404.16669").should be_false
-      end
-
-      it "validates too long ISBN and returns false" do
-        Isbnify::ISBN.valid_isbn?("978-3-404-16669-27").should be_false
-      end
-
-      it "validates malformed and too long ISBN and returns false" do
-        Isbnify::ISBN.valid_isbn?("978.3.404.16669.27").should be_false
       end
     end
 
