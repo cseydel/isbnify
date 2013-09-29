@@ -3,6 +3,9 @@ require 'bundler/setup'
 require 'nokogiri'
 require "fakeweb"
 require 'vcr'
+require 'simplecov'
+require 'simplecov-gem-adapter'
+SimpleCov.start
 
 require 'isbnify'
 
