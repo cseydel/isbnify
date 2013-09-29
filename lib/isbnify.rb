@@ -1,5 +1,6 @@
 require "isbnify/version"
 require "isbnify/isbn"
+require "isbnify/iisbna"
 
 module Isbnify
 

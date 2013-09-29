@@ -1,6 +1,12 @@
 require "spec_helper"
 
 describe Isbnify::ISBN do
+  describe "as object" do
+    it "is an ISBN object" do
+      Isbnify::ISBN.new(1).should be_kind_of(Isbnify::ISBN)
+    end
+  end
+
   describe "with class methods" do
     context "with string_argument_validations" do
       it "raises ArgumentError on missing isbn_string" do
