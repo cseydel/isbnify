@@ -16,14 +16,19 @@ module Isbnify
         self.new(isbn_string).valid_isbn?
       end
 
-      def create_isbn(number = nil)
-        self.new(number).create_isbn
+      def create_isbn
+        self.new.create_isbn
+      end
+
+      def create_isbn_checksum(number = nil)
+        self.new(number).create_isbn_checksum
       end
     end
 
 
     def hyphinate_isbn
       string_argument_validations(param)
+      Isbnify::IISBNA.new(param).hyphinate
     end
 
     def valid_isbn?
@@ -32,15 +37,16 @@ module Isbnify
     end
 
     def create_isbn
-      integer_argument_validations(param)
+      Isbnify::IISBNA.new.create_valid_isbn
+    end
+
+    def create_isbn_checksum
+      checksum_argument_validation(param)
+      return calculate_checksum(param)
     end
 
 
     private
-
-    def validate_isbn_format
-
-    end
 
     def sanitize_isbn_string
       param.gsub(/[^0-9]/, "")
@@ -80,10 +86,9 @@ module Isbnify
       validates_isbn13_length
     end
 
-    def integer_argument_validations(number)
-      validate_presence_of_attribute(number)
-      validate_type_of_attribute(number, "Integer")
-      validates_isbn13_length
+    def checksum_argument_validation(isbn_string)
+      validate_presence_of_attribute(isbn_string)
+      validate_type_of_attribute(isbn_string, "String")
     end
 
     def validates_isbn13_length

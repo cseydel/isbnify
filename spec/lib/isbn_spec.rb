@@ -25,24 +25,6 @@ describe Isbnify::ISBN do
         expect { Isbnify::ISBN.valid_isbn?(1) }.to raise_error(ArgumentError, "expected argument to be String")
       end
     end
-
-    context "with integer_argument_validations" do
-      it "raises ArgumentError on missing number" do
-        expect { Isbnify::ISBN.create_isbn }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on missing number with message" do
-        expect { Isbnify::ISBN.create_isbn }.to raise_error(ArgumentError, "expected argument not to be nil")
-      end
-
-      it "raises ArgumentError on not Integer number" do
-        expect { Isbnify::ISBN.create_isbn("error") }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError on not Integer number with message" do
-        expect { Isbnify::ISBN.create_isbn("error") }.to raise_error(ArgumentError, "expected argument to be Integer")
-      end
-    end
   end
 
   describe "with instance methods" do
@@ -64,39 +46,21 @@ describe Isbnify::ISBN do
       end
     end
 
-    context "with integer_argument_validations" do
-      it "raises ArgumentError on missing number" do
-        expect { Isbnify::ISBN.new.create_isbn }.to raise_error(ArgumentError)
+    context "with isbn length validation" do
+      it "validates too short ISBN and returns false" do
+        expect { Isbnify::ISBN.new("978-3-404-16669").valid_isbn? }.to raise_error(ArgumentError)
       end
 
-      it "raises ArgumentError on missing number with message" do
-        expect { Isbnify::ISBN.new.create_isbn }.to raise_error(ArgumentError, "expected argument not to be nil")
+      it "validates malformed and too short ISBN and returns false" do
+        expect { Isbnify::ISBN.new("978.3.404.16669").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
       end
 
-      it "raises ArgumentError on not Integer number" do
-        expect { Isbnify::ISBN.new("error").create_isbn }.to raise_error(ArgumentError)
+      it "validates too long ISBN and returns false" do
+        expect { Isbnify::ISBN.new("978-3-404-16669-27").valid_isbn? }.to raise_error(ArgumentError)
       end
 
-      it "raises ArgumentError on not Integer number with message" do
-        expect { Isbnify::ISBN.new("error").create_isbn }.to raise_error(ArgumentError, "expected argument to be Integer")
-      end
-
-      context "with isbn length validation" do
-        it "validates too short ISBN and returns false" do
-          expect { Isbnify::ISBN.new("978-3-404-16669").valid_isbn? }.to raise_error(ArgumentError)
-        end
-
-        it "validates malformed and too short ISBN and returns false" do
-          expect { Isbnify::ISBN.new("978.3.404.16669").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
-        end
-
-        it "validates too long ISBN and returns false" do
-          expect { Isbnify::ISBN.new("978-3-404-16669-27").valid_isbn? }.to raise_error(ArgumentError)
-        end
-
-        it "validates malformed and too long ISBN and returns false" do
-          expect { Isbnify::ISBN.new("978.3.404.16669.27").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
-        end
+      it "validates malformed and too long ISBN and returns false" do
+        expect { Isbnify::ISBN.new("978.3.404.16669.27").valid_isbn? }.to raise_error(ArgumentError, "expected argument to include exactly 13 digits")
       end
     end
 
@@ -115,6 +79,28 @@ describe Isbnify::ISBN do
 
       it "validates malformed and incorrect ISBN and returns false" do
         Isbnify::ISBN.valid_isbn?("ISBN 978/3/404/16669/7").should be_false
+      end
+    end
+
+    context "with hyphinate_isbn" do
+      it "delegates hyphinate to IISBNA class" do
+        Isbnify::IISBNA.any_instance.should_receive(:hyphinate).once
+        Isbnify::ISBN.new("9783404166695").hyphinate_isbn
+      end
+
+      it "receives a String" do
+        Isbnify::ISBN.new("9783404166695").hyphinate_isbn.should be_kind_of(String)
+      end
+    end
+
+    context "with hyphinate_isbn" do
+      it "delegates create to IISBNA class" do
+        Isbnify::IISBNA.any_instance.should_receive(:create_valid_isbn).once
+        Isbnify::ISBN.new.create_isbn
+      end
+
+      it "receives a String" do
+        Isbnify::ISBN.new.create_isbn.should be_kind_of(String)
       end
     end
 
