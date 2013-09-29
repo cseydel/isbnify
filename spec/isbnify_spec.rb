@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Isbnify do
+describe Isbnify, :vcr do
   describe "with correct includes" do
     it "responds to hyphinate_isbn" do
       Test.should respond_to(:hyphinate_isbn)
