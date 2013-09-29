@@ -17,8 +17,8 @@ module Isbnify
       ISBN.valid_isbn?(isbn_string)
     end
 
-    def create_isbn(number = nil)
-      ISBN.create_isbn(number)
+    def create_isbn
+      ISBN.create_isbn
     end
 
   end
