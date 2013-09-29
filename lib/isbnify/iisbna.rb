@@ -29,42 +29,54 @@ module Isbnify
 
     def xml_node_to_hash(node)
       if node.element?
-        result_hash = {}
-        if node.attributes != {}
-          attributes = {}
-          node.attributes.keys.each do |key|
-            attributes[node.attributes[key].name.to_sym] = node.attributes[key].value
-          end
-        end
-        if node.children.size > 0
-          node.children.each do |child|
-            result = xml_node_to_hash(child)
-            if child.name == "text"
-              unless child.next_sibling || child.previous_sibling
-                return result unless attributes
-                result_hash[child.name.to_sym] = result
-              end
-            elsif result_hash[child.name.to_sym]
-
-              if result_hash[child.name.to_sym].is_a?(Object::Array)
-                 result_hash[child.name.to_sym] << result
-              else
-                 result_hash[child.name.to_sym] = [result_hash[child.name.to_sym]] << result
-              end
-            else
-              result_hash[child.name.to_sym] = result
-            end
-          end
-          if attributes
-            result_hash = attributes.merge(result_hash)
-          end
-          return result_hash
-        else
-          return attributes
-        end
+        parse_element(node)
       else
         return node.content.to_s
       end
+    end
+
+    def parse_element(node)
+      result_hash = {}
+      attributes = parse_attributes(node)
+      if node.children.size > 0
+        return result_hash = parse_children(node, attributes, result_hash)
+      else
+        return attributes
+      end
+    end
+
+    def parse_attributes(node)
+      if node.attributes != {}
+        attributes = {}
+        node.attributes.keys.each do |key|
+          attributes[node.attributes[key].name.to_sym] = node.attributes[key].value
+        end
+      end
+      attributes
+    end
+
+    def parse_children(node, attributes, result_hash)
+      node.children.each do |child|
+        result = xml_node_to_hash(child)
+        if child.name == "text"
+          unless child.next_sibling || child.previous_sibling
+            return result unless attributes
+            result_hash[child.name.to_sym] = result
+          end
+        elsif result_hash[child.name.to_sym]
+          if result_hash[child.name.to_sym].is_a?(Object::Array)
+             result_hash[child.name.to_sym] << result
+          else
+             result_hash[child.name.to_sym] = [result_hash[child.name.to_sym]] << result
+          end
+        else
+          result_hash[child.name.to_sym] = result
+        end
+      end
+      if attributes
+        result_hash = attributes.merge(result_hash)
+      end
+      return result_hash
     end
 
   end
