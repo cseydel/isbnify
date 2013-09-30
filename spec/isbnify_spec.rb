@@ -32,4 +32,20 @@ describe Isbnify, :vcr do
     end
   end
 
+  describe "with response item" do
+    let(:isbn) { "9783404166695" }
+
+    it "delegates to ISBN.hyphinate_isbn" do
+      Test.hyphinate_isbn(isbn).should be_kind_of(String)
+    end
+
+    it "delegates to ISBN.valid_isbn?" do
+      Test.valid_isbn?(isbn).should be_kind_of(TrueClass)
+    end
+
+    it "delegates to ISBN.create_isbn" do
+      Test.create_isbn.should be_kind_of(String)
+    end
+  end
+
 end

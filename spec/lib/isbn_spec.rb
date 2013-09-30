@@ -91,6 +91,14 @@ describe Isbnify::ISBN do
       it "receives a String" do
         Isbnify::ISBN.new("9783404166695").hyphinate_isbn.should be_kind_of(String)
       end
+
+      it "returns an error string" do
+        Isbnify::ISBN.new("9783404166697").hyphinate_isbn.should be_kind_of(String)
+      end
+
+      it "returns an error string" do
+        Isbnify::ISBN.new("9783404166697").hyphinate_isbn.should eq "invalid ISBN given"
+      end
     end
 
     context "with hyphinate_isbn" do

@@ -36,6 +36,7 @@ module Isbnify
 
     def hyphinate_isbn
       string_argument_validations(param)
+      return "invalid ISBN given" unless valid_isbn?
       Isbnify::IISBNA.new(param).hyphinate
     end
 
