@@ -4,7 +4,7 @@ require 'open-uri'
 module Isbnify
   class IISBNA
 
-    attr_accessor :isbn, :range_hash, :prefix, :country_group, :group_hash, :publisher
+    attr_accessor :country_group, :group_hash, :isbn, :prefix, :publisher, :range_hash
 
     def initialize(isbn = "")
       @isbn       = isbn.to_s
@@ -21,32 +21,17 @@ module Isbnify
       group        = random_group[:Prefix]
       rule         = random_group[:Rules][:Rule].is_a?(Array) ? random_group[:Rules][:Rule].shuffle[0] : random_group[:Rules][:Rule]
       r_publisher  = random_publisher(rule)
-      return create_isbn(group, r_publisher)
+      create_isbn(group, r_publisher)
     end
+
 
     private
 
-    def hyphinate_with_values
-      product_id = isbn.gsub(/#{@prefix}#{@country_group}#{@publisher}/, "")
-      return "#{@prefix}-#{@country_group}-#{@publisher}-#{product_id[0..-2]}-#{product_id[-1]}"
-    end
-
-    def valid_prefix?
-      range_hash[:"ISBNRangeMessage"][:"EAN.UCCPrefixes"][:"EAN.UCC"].each do |prefix_hash|
-        return @prefix = prefix_hash[:Prefix] if prefix_hash.has_value?(isbn[0..2])
-      end
-      false
-    end
-
-    def valid_group?
-      checkstring = isbn.gsub(/^#{@prefix}/, "")
-      range_hash[:"ISBNRangeMessage"][:"RegistrationGroups"][:"Group"].each do |group_hash|
-        if group_prefix_included?(group_hash[:Prefix], checkstring)
-          @group_hash = group_hash
-          return @country_group = group_hash[:Prefix].gsub(/^#{@prefix}-/, "")
-        end
-      end
-      false
+    def create_isbn(group, r_publisher)
+      product_size  = 12 - group.gsub("-","").size - r_publisher.size
+      product       = "9999999999"[0..(product_size - 1)]
+      checksum      = Isbnify::ISBN.create_isbn_checksum(group.gsub("-","") + r_publisher + product)
+      return "#{group}-#{r_publisher}-#{product}-#{checksum}"
     end
 
     def group_prefix_included?(prefix, checkstring)
@@ -56,41 +41,13 @@ module Isbnify
       false
     end
 
-    def valid_publisher?
-      checkstring = isbn.gsub(/#{@prefix}#{@country_group}/, "")
-      @group_hash[:Rules][:Rule].each do |rule|
-        return @publisher = checkstring[valid_range(rule[:Length])] if in_range?(rule, checkstring)
-      end
+    def hyphinate_with_values
+      product_id = isbn.gsub(/#{@prefix}#{@country_group}#{@publisher}/, "")
+      return "#{@prefix}-#{@country_group}-#{@publisher}-#{product_id[0..-2]}-#{product_id[-1]}"
     end
 
     def in_range?(rule, string)
       truncated_range(rule[:Range], rule[:Length], string[valid_range(rule[:Length])])
-    end
-
-    def truncated_range(range, length, needle)
-      array = range.split("-")
-      return needle.to_i.between?((array[0][valid_range(length)]).to_i, (array[1][valid_range(length)]).to_i)
-    end
-
-    def valid_range(length)
-      (0..(length.to_i - 1))
-    end
-
-    def random_publisher(rule)
-      array = rule[:Range].split("-")
-      new_publisher  = (rand(array[1].to_i - array[0].to_i) + array[0].to_i).to_s
-      return new_publisher[valid_range(rule[:Length])]
-    end
-
-    def create_isbn(group, r_publisher)
-      product_size  = 12 - group.gsub("-","").size - r_publisher.size
-      product       = "9999999999"[0..(product_size - 1)]
-      checksum      = Isbnify::ISBN.create_isbn_checksum(group.gsub("-","") + r_publisher + product)
-      return "#{group}-#{r_publisher}-#{product}-#{checksum}"
-    end
-
-    def xml_parse
-      open_url_with_file_fallback.to_hash
     end
 
     def open_url_with_file_fallback
@@ -101,7 +58,55 @@ module Isbnify
       end
     end
 
+    def random_publisher(rule)
+      array = rule[:Range].split("-")
+      new_publisher  = (rand(array[1].to_i - array[0].to_i) + array[0].to_i).to_s
+      return new_publisher[valid_range(rule[:Length])]
+    end
+
+    def truncated_range(range, length, needle)
+      array = range.split("-")
+      needle.to_i.between?((array[0][valid_range(length)]).to_i, (array[1][valid_range(length)]).to_i)
+    end
+
+    def valid_group?
+      sanitized_string = isbn.gsub(/^#{@prefix}/, "")
+      range_hash[:"ISBNRangeMessage"][:"RegistrationGroups"][:"Group"].each do |group_hash|
+        if group_prefix_included?(group_hash[:Prefix], sanitized_string)
+          @group_hash = group_hash
+          return @country_group = group_hash[:Prefix].gsub(/^#{@prefix}-/, "")
+        end
+      end
+      false
+    end
+
+    def valid_prefix?
+      range_hash[:"ISBNRangeMessage"][:"EAN.UCCPrefixes"][:"EAN.UCC"].each do |prefix_hash|
+        return @prefix = prefix_hash[:Prefix] if prefix_hash.has_value?(isbn[0..2])
+      end
+      false
+    end
+
+    def valid_publisher?
+      sanitized_string = isbn.gsub(/#{@prefix}#{@country_group}/, "")
+      @group_hash[:Rules][:Rule].each do |rule|
+        return @publisher = sanitized_string[valid_range(rule[:Length])] if in_range?(rule, sanitized_string)
+      end
+    end
+
+    def valid_range(length)
+      (0..(length.to_i - 1))
+    end
+
+
+    # XML parser methods
     # modified from http://stackoverflow.com/questions/1230741/convert-a-nokogiri-document-to-a-ruby-hash/1231297#123129
+    #
+
+    def xml_parse
+      open_url_with_file_fallback.to_hash
+    end
+
     def xml_to_hash(xml_io)
       result = Nokogiri::XML(xml_io)
       return { result.root.name.to_sym => xml_node_to_hash(result.root)}
