@@ -16,12 +16,15 @@ Include Isbnify into your controller and use the helper actions or call object I
 ### Functions
 
 ``create_isbn`` or ``Isbnify::ISBN.create_isbn``
+
 Returns a random, yet valid fake ISBN allready hyphinated.
 
 ``hyphinate_isbn(String)`` or ``Isbnify::ISBN.hyphinate_isbn(String)``
+
 Returns hyphinated ISBN or error message as String.
 
 ``valid_isbn?(String)`` or ``Isbnify::ISBN.valid_isbn?(String)``
+
 Returns true or false, whether a given ISBN is valid or not. It can be passed as hyphinated ISBN or not.
 
 
@@ -48,6 +51,10 @@ class ApplicationController < ActionController
 
 end
 ```
+
+### Ruby Versions
+
+This gem was developed and tested with versions 1.9.3 and 2.0.0
 
 ### Contributing
 
