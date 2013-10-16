@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["christoph.seydel@me.com"]
   spec.description   = %q{This gem verifies, creates and hyphinates ISBN13 numbers}
   spec.summary       = %q{This gem verifies, creates and hyphinates ISBN13 numbers}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/cseydel/isbnify"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
