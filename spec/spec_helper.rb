@@ -5,7 +5,11 @@ require "fakeweb"
 require 'vcr'
 require 'simplecov'
 require 'simplecov-gem-adapter'
-SimpleCov.start
+
+SimpleCov.start do
+  add_filter 'spec'
+  add_filter 'vendor'
+end
 
 require 'isbnify'
 
