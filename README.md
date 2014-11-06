@@ -1,6 +1,8 @@
 isbnify
 =======
 
+[![isbnify API Documentation](https://www.omniref.com/ruby/gems/isbnify.png)](https://www.omniref.com/ruby/gems/isbnify)
+
 hyphenate, verify and create ISBN13 numbers
 
 ### Functionality
@@ -66,4 +68,4 @@ This gem was developed and tested with versions 1.9.3 and 2.0.0
 
 ### Copyright
 
-Copyright (c) 2013 Christoph Seydel. See LICENSE for further details.
+Copyright (c) 2014 Christoph Seydel. See LICENSE for further details.
