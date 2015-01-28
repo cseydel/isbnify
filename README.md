@@ -68,4 +68,4 @@ This gem was developed and tested with versions 1.9.3 and 2.0.0
 
 ### Copyright
 
-Copyright (c) 2014 Christoph Seydel. See LICENSE for further details.
+Copyright (c) 2013 - 2015 Christoph Seydel. See LICENSE for further details.
